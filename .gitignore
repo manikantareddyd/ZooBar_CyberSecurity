@@ -1,4 +1,14 @@
-zookld zookfs zookd zookfs-exstack zookd-exstack zookfs-nxstack zookd-nxstack zookfs-withssp zookd-withssp shellcode.bin run-shellcode
+./zookld
+./zookfs
+./zookd.
+./zookfs-exstack
+./zookd-exstack
+./zookfs-nxstack
+./zookd-nxstack
+./zookfs-withssp
+./zookd-withssp
+./shellcode.bin 
+./run-shellcode
 *.o
 *.pyc
 *.bin
