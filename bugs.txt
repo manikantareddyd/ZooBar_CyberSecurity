@@ -2,6 +2,13 @@
 # [file:#lines]
 # desc
 #
+[zookd.c:71]
+If we could overflow 'reqpath', 'fd', an integer, can be manipulated. 
+This will cause the server to crash as the modified value will not be 
+a valid file descriptor and will lead to a segmentation fault.
+
+    /* get the request line */
+    if ((errmsg = http_request_line(fd, reqpath, sizeof(reqpath), env, &env_len)))
 
 [zookd.c:1234]
 description goes here. for example, the 'buf' variable can be

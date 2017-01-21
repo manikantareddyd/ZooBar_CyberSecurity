@@ -12,3 +12,6 @@ zookfs-withssp
 zookd-withssp
 shellcode.bin 
 run-shellcode
+tmp/*.*
+.vscode-upload.json
+"\001\273MR@\270R\203@8"
