@@ -2,23 +2,41 @@
 # [file:#lines]
 # desc
 #
-[zookd.c:71]
-If we could overflow 'reqpath', 'fd', an integer, can be manipulated. 
-This will cause the server to crash as the modified value will not be 
-a valid file descriptor and will lead to a segmentation fault.
+[http.c:30]
+It can be seen that size of buffer is not checked and simply everything is copied from *buf and so on. Given sufficiently long input entire stack can be over written by input for buf.
+    int http_read_line(int fd, char *buf, size_t size)
+    {
+        size_t i = 0;
 
-    /* get the request line */
-    if ((errmsg = http_request_line(fd, reqpath, sizeof(reqpath), env, &env_len)))
+        for (;;)
+        {
+            int cc = read(fd, &buf[i], 1);
+            if (cc <= 0)
+                break;
 
-[zookd.c:1234]
-description goes here. for example, the 'buf' variable can be
-overwritten by the 'msg' variable because ...
+            if (buf[i] == '\r')
+            {
+                buf[i] = '\0';      /* skip */
+                continue;
+            }
 
-    <paste offending line(s) of code here>
+            if (buf[i] == '\n')
+            {
+                buf[i] = '\0';
+                return 0;
+            }
 
-[http.c:1234]
-another description.
+            if (i >= size - 1)
+            {
+                buf[i] = '\0';
+                return 0;
+            }
 
-    <paste offending line(s) of code here>
+            i++;
+        }
+
+        return -1;
+    }
+
 
 # many more come here
