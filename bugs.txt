@@ -38,5 +38,17 @@ It can be seen that size of buffer is not checked and simply everything is copie
         return -1;
     }
 
+[http.c:65]
+The above bug[http.c:30] allows us to overflow the buffer and reqrite crucial stuff like the file descriptor, due to which the server crashes
+
+[http.c:121]
+The above bug[http.c:30] allows us to overflow the buffer and reqrite crucial stuff like the file descriptor, due to which the server crashes
+
+[http.c:397]
+The above bug[http.c:30] allows us to overflow the buffer and reqrite crucial stuff like the file descriptor, due to which the server crashes
+
+[http.c:274]
+Insecure use of strcat. The 'name' buffer can be of length 2048. Its being concatenated with 'pn' buffer of size 1024. Buffer overflow possible.
+    strcat(pn, name);
 
 # many more come here
