@@ -14,4 +14,4 @@ Part 2
 
 [http.c:274] Shellcode injection possible. It can be done either by rewriting the return address or the function pointer 'handler'. But we have to be carefull that the program doesn't terminate before it reaches here.
 
- [http.c:88][http.c:94] Shellcode injection is possible by overflowing 'envp'. But these exploits would be extremely tedious considering the amount of precision required to maitain other addresses intact. 
+[http.c:88][http.c:94] Shellcode injection is possible by overflowing 'envp'. But these exploits would be extremely tedious considering the amount of precision required to maitain other addresses intact. 
