@@ -18,8 +18,8 @@
 	movb	%al,(STRLEN)(%esi)	/* null-terminate our string */
 	movl	%eax,(ENVP)(%esi)	/* set up null envp */
 
-	movb	$7,%al		/* syscall arg 1: syscall number */
-	addb	$3, %al
+	movb	$9,%al		/* syscall arg 1: syscall number */
+	inc		%al			/* We need to put 10 in al, so we put 9 and add 1 :P */
 	movl	%esi,%ebx		/* syscall arg 2: string pathname */
 	leal	ARGV(%esi),%ecx		/* syscall arg 2: argv */
 	leal	ENVP(%esi),%edx		/* syscall arg 3: envp */

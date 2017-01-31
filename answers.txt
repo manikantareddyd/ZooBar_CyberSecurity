@@ -1,1 +1,17 @@
 ## Place your answers here.
+
+Part 1
+
+exploit-2a.py exploits [http.c:65]. This leads to an overflow in the local buffer 'buf' which has been used to reqrite the return address of the function 'http_request_line". This crashes the server.
+
+exploit-2b.py exploits [http.c:274]. The insecure use of strcat has provided us with a way to overwrite a function pointer by name 'handler'. The way the program is written we are sure that 'handler' will be called. But the value of handler being 0x41414141, the system crashes with a SIGSEV. 
+
+Part 2
+
+[http.c:65] Shellcode injection possible, but we have to be carefull with the 'envp' value, as its corruption can lead to segmentation fault.
+
+[http.c:397] This vulnerability/bug cannot be exploited by a client side attack.
+
+[http.c:274] Shellcode injection possible. It can be done either by rewriting the return address or the function pointer 'handler'. But we have to be carefull that the program doesn't terminate before it reaches here.
+
+ [http.c:88][http.c:94] Shellcode injection is possible by overflowing 'envp'. But these exploits would be extremely tedious considering the amount of precision required to maitain other addresses intact. 

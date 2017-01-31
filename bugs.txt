@@ -40,6 +40,7 @@
 
 [http.c:65]
 2. The above bug[http.c:30] allows us to overflow the buffer and reqrite crucial stuff like the file descriptor, due to which the server crashes. This can be prevented by the use of canaries as the buffer 'buf' is just below %ebp any change in canary can be detected.
+If done smartly can also lead to overflow at [zookd.c:71].
 -----------------------------------------------
 Buggy Code
     if (http_read_line(fd, buf) < 0)
@@ -54,6 +55,7 @@ Here x depends on other variables
 
 [http.c:121]
 3. The above bug[http.c:30] allows us to overflow the buffer of headers and reqrite crucial stuff like the return address, due to which the server crashes. This can be prevented by the use of canaries as the buffer 'buf' is just below %ebp any change in canary can be detected.
+If done smartly can also lead to overflow at [zookfs.c:46].
 -----------------------------------------------
 Buggy Code
     if (http_read_line(fd, buf) < 0)
@@ -81,6 +83,7 @@ Exploit
 [http.c:274]
 5. Insecure use of strcat. The 'name' buffer can be of length 2048. Its being concatenated to 'pn' buffer of size 1024. Buffer overflow possible. 
 Attack on this can go unnoticed by canaries, as the function pointer we wish to exploit is below ebp.
+If done smartly can also lead to overflow at [zookfs.c:49].
 -------------------------------------------------------
 Buggy Code
     strcat(pn, name);
