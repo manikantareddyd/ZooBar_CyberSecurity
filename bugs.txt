@@ -3,7 +3,7 @@
 # desc
 #
 [http.c:30]
-It can be seen that size of buffer is not checked and simply everything is copied from *buf and so on. Given sufficiently long input entire stack can be over written by input for buf.
+1. It can be seen that size of buffer is not checked and simply everything is copied from *buf and so on. Given sufficiently long input entire stack can be over written by input for buf.
     int http_read_line(int fd, char *buf, size_t size)
     {
         size_t i = 0;
@@ -39,7 +39,7 @@ It can be seen that size of buffer is not checked and simply everything is copie
     }
 
 [http.c:65]
-The above bug[http.c:30] allows us to overflow the buffer and reqrite crucial stuff like the file descriptor, due to which the server crashes. This can be prevented by the use of canaries as the buffer 'buf' is just below %ebp any change in canary can be detected.
+2. The above bug[http.c:30] allows us to overflow the buffer and reqrite crucial stuff like the file descriptor, due to which the server crashes. This can be prevented by the use of canaries as the buffer 'buf' is just below %ebp any change in canary can be detected.
 -----------------------------------------------
 Buggy Code
     if (http_read_line(fd, buf) < 0)
@@ -53,7 +53,7 @@ Here x depends on other variables
 
 
 [http.c:121]
-The above bug[http.c:30] allows us to overflow the buffer and reqrite crucial stuff like the return address, due to which the server crashes. This can be prevented by the use of canaries as the buffer 'buf' is just below %ebp any change in canary can be detected.
+3. The above bug[http.c:30] allows us to overflow the buffer and reqrite crucial stuff like the return address, due to which the server crashes. This can be prevented by the use of canaries as the buffer 'buf' is just below %ebp any change in canary can be detected.
 -----------------------------------------------
 Buggy Code
     if (http_read_line(fd, buf) < 0)
@@ -66,7 +66,7 @@ Here x depends on other variables
 ------------------------------------------------
 
 [http.c:397]
-The above bug[http.c:30] allows us to overflow the buffer. But this function is called by the server and is not as exciting. 
+4. The above bug[http.c:30] allows us to overflow the buffer. But this function is called by the server and is not as exciting. 
 -------------------------------------------------------
 Buggy Code
     if (http_read_line(pipefd[0], buf) < 0) {
@@ -80,7 +80,7 @@ Exploit
 -------------------------------------------------------
 
 [http.c:274]
-Insecure use of strcat. The 'name' buffer can be of length 2048. Its being concatenated to 'pn' buffer of size 1024. Buffer overflow possible. 
+5. Insecure use of strcat. The 'name' buffer can be of length 2048. Its being concatenated to 'pn' buffer of size 1024. Buffer overflow possible. 
 Attack on this can go unnoticed by canaries, as the function pointer we wish to exploit is below ebp.
 -------------------------------------------------------
 Buggy Code
@@ -90,7 +90,7 @@ Exploit
     "GET /" + (Malicious function pointers) + "HTTP/1.0\r\n\r\n"
 -------------------------------------------------------
 
-[http.c:88]
+6. [http.c:88]
 Vulnerable buffer 'env'. Server protocol could be a string of arbitrary length, flooding the envp/env buffer. This leads to overflow at [zookd.c:71]. Can be prevented by canaries as env is above ebp.
 -------------------------------------------------------
 Buggy Code
@@ -101,7 +101,7 @@ Exploit
 -------------------------------------------------------
 
 [http.c:94]
-Vulnerable buffer 'env'. Server protocol could be a string of arbitrary length, flooding the envp/env buffer. This leads to overflow at [zookd.c:71]. Can be prevented by canaries as env is above ebp.
+7. Vulnerable buffer 'env'. Server protocol could be a string of arbitrary length, flooding the envp/env buffer. This leads to overflow at [zookd.c:71]. Can be prevented by canaries as env is above ebp.
 -------------------------------------------------------
 Buggy Code
     envp += sprintf(envp, QUERY_STRING=%s", qp + 1) + 1;
