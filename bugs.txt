@@ -53,16 +53,15 @@ Here x depends on other variables
 
 
 [http.c:121]
-3. The above bug[http.c:30] allows us to overflow the buffer and reqrite crucial stuff like the return address, due to which the server crashes. This can be prevented by the use of canaries as the buffer 'buf' is just below %ebp any change in canary can be detected.
+3. The above bug[http.c:30] allows us to overflow the buffer of headers and reqrite crucial stuff like the return address, due to which the server crashes. This can be prevented by the use of canaries as the buffer 'buf' is just below %ebp any change in canary can be detected.
 -----------------------------------------------
 Buggy Code
     if (http_read_line(fd, buf) < 0)
         return "Socket IO error";
 -----------------------------------------------
 Exploit
-    "GET /" + "A" (x times) + "HTTP/1.0\r\n\r\n" 
+    "GET / HTTP/1.0\r\n Cookie: " + (malicious code) + "\r\n\r\n" 
 
-Here x depends on other variables
 ------------------------------------------------
 
 [http.c:397]
