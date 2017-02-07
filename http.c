@@ -27,7 +27,7 @@ void touch(const char *name) {
         close(fd);
 }
 
-int http_read_line(int fd, char *buf)
+int http_read_line(int fd, char *buf, int buf_size)
 {
    size_t i = 0;
     for (;;)
@@ -49,20 +49,20 @@ int http_read_line(int fd, char *buf)
         }
 
         i++;
+        if(i>buf_size) break;
     }
 
     return -1;
 }
 
-const char *http_request_line(int fd, char *reqpath, size_t reqpath_len, char *env, size_t *env_len)
+const char *http_request_line(int fd, char *reqpath, size_t reqpath_len, char *env, size_t *env_len, int env_size)
 {
     char buf[4096];
     char *sp1, *sp2, *qp, *envp = env;
-
     /* For lab 2: don't remove this line. */
     touch("http_request_line");
 
-    if (http_read_line(fd, buf) < 0)
+    if (http_read_line(fd, buf, sizeof(buf)) < 0)
         return "Socket IO error";
 
     /* Parse request like "GET /foo.html HTTP/1.0" */
@@ -84,22 +84,36 @@ const char *http_request_line(int fd, char *reqpath, size_t reqpath_len, char *e
     if (strcmp(buf, "GET") && strcmp(buf, "POST"))
         return "Unsupported request (not GET or POST)";
 
+    if (strlen(buf) + 15 > env_size )
+        return "Buffer Overflow in env";
     envp += sprintf(envp, "REQUEST_METHOD=%s", buf) + 1;
+    
+    
+    if (strlen(buf) + 15 + strlen(sp2) + 16> env_size )
+        return "Buffer Overflow in env";
     envp += sprintf(envp, "SERVER_PROTOCOL=%s", sp2) + 1;
-
+    
     /* parse out query string, e.g. "foo.py?user=bob" */
     if ((qp = strchr(sp1, '?')))
     {
         *qp = '\0';
+        if (strlen(buf) + 15 + strlen(sp2) + 16 + strlen(qp) + 13 > env_size )
+            return "Buffer Overflow in env";
         envp += sprintf(envp, "QUERY_STRING=%s", qp + 1) + 1;
+        
     }
 
     /* decode URL escape sequences in the requested path into reqpath */
     url_decode(reqpath, sp1, reqpath_len);
 
+    if (strlen(buf) + 15 + strlen(sp2) + 16 + strlen(qp) + 13 + strlen(reqpath) + 12 > env_size )
+            return "Buffer Overflow in env";
     envp += sprintf(envp, "REQUEST_URI=%s", reqpath) + 1;
+    
+    if (strlen(buf) + 15 + strlen(sp2) + 16 + strlen(qp) + 13 + strlen(reqpath) + 12 + 22> env_size )
+            return "Buffer Overflow in env";
     envp += sprintf(envp, "SERVER_NAME=zoobar.org") + 1;
-
+    
     *envp = 0;
     *env_len = envp - env + 1;
     return NULL;
@@ -118,7 +132,7 @@ const char *http_request_headers(int fd)
     /* Now parse HTTP headers */
     for (;;)
     {
-        if (http_read_line(fd, buf) < 0)
+        if (http_read_line(fd, buf, sizeof(buf)) < 0)
             return "Socket IO error";
 
         if (buf[0] == '\0')     /* end of headers */
@@ -271,7 +285,15 @@ void http_serve(int fd, const char *name)
     getcwd(pn, sizeof(pn));
     setenv("DOCUMENT_ROOT", pn, 1);
 
-    strcat(pn, name);
+    if(strlen(pn)+strlen(name) <= sizeof(pn))
+    {
+        strcat(pn, name);
+    }
+    else
+    {
+        handler(fd, name);
+        return;
+    }
     split_path(pn);
 
     if (!stat(pn, &st))
@@ -394,7 +416,7 @@ void http_serve_executable(int fd, const char *pn)
     default:
         close(pipefd[1]); /* write end */
         while (1) {
-            if (http_read_line(pipefd[0], buf) < 0) {
+            if (http_read_line(pipefd[0], buf, sizeof(buf)) < 0) {
                 http_err(fd, 500, "Premature end of script headers");
                 close(pipefd[0]);
                 return;

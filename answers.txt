@@ -25,6 +25,11 @@ Exercise 5:
 
 1. One of the core issues of a server based architecture is their susceptibility to Denial of Service attacks. It is usually the case that the server infrastructure has a provision to detect and supress DOS attacks. This is an architectural design problem. Simply put zoobar can be crashed by sending many requests simultaneously. It'll fork many threads and eventually the physical resources run out and the system crashes.
 
-2. Accessing sensitive information. The way the server code handles requests, we can serve anyfile. Moreover the system being linux based any file can be requested by correctly formatting the path. To make things more interesting, anyfile can be executed. In other words zoobar server isn't sandboxed. It makes the rest of the system vulnerable. exploit-filepath.py and exploit-filerun.py highlight such an attack. 
+Can be contained by implemeting load balancers that shed the server stress to other systems. Even this doesn't fix the problem. 
+Block malicious senders. 
 
-3. 
+2. Accessing sensitive information. The way the server code handles requests, we can serve anyfile. Moreover the system being linux based any file can be requested by correctly formatting the path. In other words zoobar server isn't contained. It makes the rest of the system vulnerable. exploit-filepath.py highlight such an attack. 
+
+3. Executig remote jobs. To make things more interesting, anyfile can be executed. exploit-filerun.py execute this. Zoobar is privilieged to execute scripts beyond its realm. It isn't sandboxed from other process.  
+
+2 & 3 can be prevented by setting up priviliege seperation. Allow zoobar to access files only that it is allowed to. 

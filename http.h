@@ -5,7 +5,7 @@
 #include <sys/types.h>
 #include <stddef.h>
 
-const char *http_request_line(int fd, char *reqpath, size_t reqpath_len, char *env, size_t *env_len);
+const char *http_request_line(int fd, char *reqpath, size_t reqpath_len, char *env, size_t *env_len, int env_size);
 
 const char *http_request_headers(int fd);
 
