@@ -93,25 +93,36 @@ const char *http_request_line(int fd, char *reqpath, size_t reqpath_len, char *e
         return "Buffer Overflow in env";
     envp += sprintf(envp, "SERVER_PROTOCOL=%s", sp2) + 1;
     
+    int flag=0;
     /* parse out query string, e.g. "foo.py?user=bob" */
     if ((qp = strchr(sp1, '?')))
     {
         *qp = '\0';
-        if (strlen(buf) + 15 + strlen(sp2) + 16 + strlen(qp) + 13 > env_size )
+        if (strlen(buf) + 15 + strlen(sp2) + 16 + strlen(qp+1) + 13 > env_size )
             return "Buffer Overflow in env";
         envp += sprintf(envp, "QUERY_STRING=%s", qp + 1) + 1;
-        
+        flag=1;
     }
 
     /* decode URL escape sequences in the requested path into reqpath */
     url_decode(reqpath, sp1, reqpath_len);
 
-    if (strlen(buf) + 15 + strlen(sp2) + 16 + strlen(qp) + 13 + strlen(reqpath) + 12 > env_size )
+    if(flag==1)
+    {
+        if (strlen(buf) + 15 + strlen(sp2) + 16 + strlen(qp+1) + 13 + strlen(reqpath) + 12 > env_size  )
             return "Buffer Overflow in env";
+    }
+    if (strlen(buf) + 15 + strlen(sp2) + 16  + strlen(reqpath) + 12 > env_size )
+        return "Buffer Overflow in env";
     envp += sprintf(envp, "REQUEST_URI=%s", reqpath) + 1;
-    
-    if (strlen(buf) + 15 + strlen(sp2) + 16 + strlen(qp) + 13 + strlen(reqpath) + 12 + 22> env_size )
+
+    if(flag==1)
+    {
+        if (strlen(buf) + 15 + strlen(sp2) + 16 + strlen(qp+1) + 13 + strlen(reqpath) + 12 + 22 > env_size  )
             return "Buffer Overflow in env";
+    }
+    if (strlen(buf) + 15 + strlen(sp2) + 16  + strlen(reqpath) + 12 + 22> env_size )
+        return "Buffer Overflow in env";
     envp += sprintf(envp, "SERVER_NAME=zoobar.org") + 1;
     
     *envp = 0;
