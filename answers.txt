@@ -17,3 +17,14 @@ Part 2
 [http.c:88][http.c:94] Shellcode injection is possible by overflowing 'envp'. But these exploits would be extremely tedious considering the amount of precision required to maitain other addresses intact. 
 
 exploit-3.py exploits [http.c:121]. We overflow the local buffer with a combination of nops, shellcode and padding and rewrite the return address of the 'http_request_headers' function to execute our custom shellcode.
+
+
+Part 4
+
+Exercise 5:
+
+1. One of the core issues of a server based architecture is their susceptibility to Denial of Service attacks. It is usually the case that the server infrastructure has a provision to detect and supress DOS attacks. This is an architectural design problem. Simply put zoobar can be crashed by sending many requests simultaneously. It'll fork many threads and eventually the physical resources run out and the system crashes.
+
+2. Accessing sensitive information. The way the server code handles requests, we can serve anyfile. Moreover the system being linux based any file can be requested by correctly formatting the path. To make things more interesting, anyfile can be executed. In other words zoobar server isn't sandboxed. It makes the rest of the system vulnerable. exploit-filepath.py and exploit-filerun.py highlight such an attack. 
+
+3. 
